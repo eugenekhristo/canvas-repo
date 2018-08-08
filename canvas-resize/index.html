@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Canvas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        canvas {
+            width: 100vw;
+            height: 99vh;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector('canvas')
+        canvas.width = canvas.clientWidth
+        canvas.height = canvas.clientHeight
+        const ctx = canvas.getContext('2d')
+
+        // ctx.fillStyle = 'orangered'
+        // ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        // ctx.fillStyle = 'rgba(180, 180, 180, .8)'
+        // ctx.fillRect(50, 50, 100, 100)
+        
+        // // lines
+        // ctx.beginPath()
+        // ctx.moveTo(170, 170)
+        // ctx.lineTo(170, 30)
+        // ctx.strokeStyle = '#ccc'
+        // ctx.stroke()
+
+        // ctx.beginPath()
+        // ctx.moveTo(170, 30)
+        // ctx.lineTo(30, 30)
+        // ctx.strokeStyle = '#ccc'
+        // ctx.stroke()
+
+        // ctx.beginPath()
+        // ctx.moveTo(30, 30)
+        // ctx.lineTo(30, 170)
+        // ctx.strokeStyle = '#ccc'
+        // ctx.stroke()
+
+        // ctx.beginPath()
+        // ctx.moveTo(30, 170)
+        // ctx.lineTo(170, 170)
+        // ctx.strokeStyle = '#ccc'
+        // ctx.stroke()
+
+        function drawCircle(x, y, r, color = 'blue', strokeColor) {
+            ctx.strokeStyle = strokeColor
+            ctx.fillStyle = color
+            ctx.beginPath()
+            ctx.arc(x, y, r, 0, Math.PI * 2)
+            ctx.stroke()
+            ctx.fill()
+        }
+
+        function randomRange(from, to) {
+            return Math.floor(Math.random() * (to - from + 1)) + from
+        }
+
+        function randomColor() {
+            return `rgb(${randomRange(0, 255)}, ${randomRange(0, 255)}, ${randomRange(0, 255)})`
+        }
+
+        function drawCircles(n) {
+            for(let i = 0; i < n; i++) {
+                let r = 2
+                drawCircle(randomRange(r, canvas.width - r), randomRange(r, canvas.height - r), r, randomColor())
+            }
+        }
+
+        function drawEverything() {
+            ctx.fillStyle = 'white'
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+            drawCircles(5300)
+        }
+
+        setInterval(drawEverything, 100)
+
+    </script>
+</body>
+</html>
