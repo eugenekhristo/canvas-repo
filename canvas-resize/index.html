@@ -12,19 +12,42 @@
             box-sizing: border-box;
         }
 
-
         canvas {
             width: 100vw;
             height: 99vh;
+        }
+
+        body {
+            background-color: black;
+        }
+
+        h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: red;
+            font-size: 300px;
+            font-family: Arial, Helvetica, sans-serif;
+            letter-spacing: 10px;
+            text-shadow: 15px 15px 0 black,
+            -15px -15px 0 black,
+            -15px 15px 0 black,
+            15px -15px 0 black,
+            0 15px 0 black,
+            0 -15px 0 black;
         }
     </style>
 </head>
 <body>
     <canvas></canvas>
+    <h1>NICE</h1>
     <script>
         const canvas = document.querySelector('canvas')
         canvas.width = canvas.clientWidth
         canvas.height = canvas.clientHeight
+        let canvasW = canvas.width 
+        let canvasH = canvas.height 
         const ctx = canvas.getContext('2d')
 
         // ctx.fillStyle = 'orangered'
@@ -58,14 +81,14 @@
         // ctx.strokeStyle = '#ccc'
         // ctx.stroke()
 
-        function drawCircle(x, y, r, color = 'blue', strokeColor) {
-            ctx.strokeStyle = strokeColor
-            ctx.fillStyle = color
-            ctx.beginPath()
-            ctx.arc(x, y, r, 0, Math.PI * 2)
-            ctx.stroke()
-            ctx.fill()
-        }
+        // function drawCircle(x, y, r, color = 'blue', strokeColor) {
+        //     ctx.strokeStyle = strokeColor
+        //     ctx.fillStyle = color
+        //     ctx.beginPath()
+        //     ctx.arc(x, y, r, 0, Math.PI * 2)
+        //     ctx.stroke()
+        //     ctx.fill()
+        // }
 
         function randomRange(from, to) {
             return Math.floor(Math.random() * (to - from + 1)) + from
@@ -75,20 +98,65 @@
             return `rgb(${randomRange(0, 255)}, ${randomRange(0, 255)}, ${randomRange(0, 255)})`
         }
 
-        function drawCircles(n) {
-            for(let i = 0; i < n; i++) {
-                let r = 2
-                drawCircle(randomRange(r, canvas.width - r), randomRange(r, canvas.height - r), r, randomColor())
+        // function drawCircles(n) {
+        //     for(let i = 0; i < n; i++) {
+        //         let r = 2
+        //         drawCircle(randomRange(r, canvas.width - r), randomRange(r, canvas.height - r), r, randomColor())
+        //     }
+        // }
+
+        // function drawEverything() {
+        //     ctx.fillStyle = 'white'
+        //     ctx.fillRect(0, 0, canvas.width, canvas.height)
+        //     drawCircles(5300)
+        // }
+
+        // setInterval(drawEverything, 100)
+
+        function createCircle(x, y, r = 45, dx, dy, color = randomColor()) {
+            x = (Math.random() * (canvasW - r * 2)) + r
+            y = (Math.random() * (canvasH - r * 2)) + r
+            dx = (Math.random() - 0.5) * 2
+            dy = (Math.random() - 0.5) * 2
+
+            function draw() {
+                ctx.strokeStyle = color
+                ctx.lineWidth = 10
+                ctx.fillStyle = 'black'
+                ctx.beginPath()
+                ctx.arc(x, y, r, 0, Math.PI * 2)
+                ctx.stroke()
+                ctx.fill()
+            }
+
+            function move() {
+                draw()
+                x += dx
+                y += dy
+                if(x + r >= canvasW || x - r <= 0) dx *= -1
+                if(y + r >= canvasH || y - r <= 0) dy *= -1
+            }
+
+            return {
+                move
             }
         }
-
-        function drawEverything() {
-            ctx.fillStyle = 'white'
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-            drawCircles(5300)
+        
+        const circles = []
+        for(let i = 0; i < 300; i++) {
+            circles.push(createCircle())
         }
 
-        setInterval(drawEverything, 100)
+    
+        (function animate() {
+            requestAnimationFrame(animate)
+            ctx.clearRect(0, 0, canvasW, canvasH)
+            for(const circle of circles) {
+                circle.move()
+            }
+        })()
+
+
 
     </script>
 </body>
