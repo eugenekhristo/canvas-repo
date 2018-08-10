@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,116 +17,79 @@
             width: 100vw;
             height: 99vh;
         }
-
-        body {
-            background-color: black;
-        }
-
-        h1 {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: red;
-            font-size: 300px;
-            font-family: Arial, Helvetica, sans-serif;
-            letter-spacing: 10px;
-            text-shadow: 15px 15px 0 black,
-            -15px -15px 0 black,
-            -15px 15px 0 black,
-            15px -15px 0 black,
-            0 15px 0 black,
-            0 -15px 0 black;
-        }
     </style>
 </head>
+
 <body>
     <canvas></canvas>
-    <h1>NICE</h1>
     <script>
         const canvas = document.querySelector('canvas')
         canvas.width = canvas.clientWidth
         canvas.height = canvas.clientHeight
-        let canvasW = canvas.width 
-        let canvasH = canvas.height 
+        let canvasW = canvas.width
+        let canvasH = canvas.height
         const ctx = canvas.getContext('2d')
 
-        // ctx.fillStyle = 'orangered'
-        // ctx.fillRect(0, 0, canvas.width, canvas.height)
+        function getMaxCirclesAmount() {
+            let ratio = canvasW * canvasH / 100000
+            if (ratio > 7) return 1400
+            else if (ratio > 5) return 1100
+            else if (ratio > 3) return 800
+            else if (ratio > 1) return 500
+            else return 300
+        }
 
-        // ctx.fillStyle = 'rgba(180, 180, 180, .8)'
-        // ctx.fillRect(50, 50, 100, 100)
+        const maxR = 5
+        const minR = 1
+        const bloatedR = 30
+        let maxCirclesAmount = getMaxCirclesAmount()
         
-        // // lines
-        // ctx.beginPath()
-        // ctx.moveTo(170, 170)
-        // ctx.lineTo(170, 30)
-        // ctx.strokeStyle = '#ccc'
-        // ctx.stroke()
 
-        // ctx.beginPath()
-        // ctx.moveTo(170, 30)
-        // ctx.lineTo(30, 30)
-        // ctx.strokeStyle = '#ccc'
-        // ctx.stroke()
+        const colors = [
+            '#2C3E50',
+            '#2C3E50',
+            '#E74C3C',
+            '#E74C3C',
+            '#BECCF1',
+            '#3498DB',
+            '#2980B9'
+        ]
 
-        // ctx.beginPath()
-        // ctx.moveTo(30, 30)
-        // ctx.lineTo(30, 170)
-        // ctx.strokeStyle = '#ccc'
-        // ctx.stroke()
-
-        // ctx.beginPath()
-        // ctx.moveTo(30, 170)
-        // ctx.lineTo(170, 170)
-        // ctx.strokeStyle = '#ccc'
-        // ctx.stroke()
-
-        // function drawCircle(x, y, r, color = 'blue', strokeColor) {
-        //     ctx.strokeStyle = strokeColor
-        //     ctx.fillStyle = color
-        //     ctx.beginPath()
-        //     ctx.arc(x, y, r, 0, Math.PI * 2)
-        //     ctx.stroke()
-        //     ctx.fill()
-        // }
-
-        function randomRange(from, to) {
-            return Math.floor(Math.random() * (to - from + 1)) + from
+        const mouse = {
+            x: undefined,
+            y: undefined
         }
 
-        function randomColor() {
-            return `rgb(${randomRange(0, 255)}, ${randomRange(0, 255)}, ${randomRange(0, 255)})`
-        }
+        canvas.addEventListener('mousemove', e => {
+            mouse.x = e.x
+            mouse.y = e.y
+        })
 
-        // function drawCircles(n) {
-        //     for(let i = 0; i < n; i++) {
-        //         let r = 2
-        //         drawCircle(randomRange(r, canvas.width - r), randomRange(r, canvas.height - r), r, randomColor())
-        //     }
-        // }
+        window.addEventListener('resize', e => {
+            canvas.width = canvas.clientWidth
+            canvas.height = canvas.clientHeight
+            canvasW = canvas.width
+            canvasH = canvas.height
+            maxCirclesAmount = getMaxCirclesAmount()
+            // create brand new portion of circles
+            initProcess()
+            console.log(maxCirclesAmount)
+        })
 
-        // function drawEverything() {
-        //     ctx.fillStyle = 'white'
-        //     ctx.fillRect(0, 0, canvas.width, canvas.height)
-        //     drawCircles(5300)
-        // }
-
-        // setInterval(drawEverything, 100)
-
-        function createCircle(x, y, r = 45, dx, dy, color = randomColor()) {
+        function createCircle(x, y, r, dx, dy, color) {
+            r = Math.random() * (maxR - minR) + minR
+            let mainR = r
             x = (Math.random() * (canvasW - r * 2)) + r
             y = (Math.random() * (canvasH - r * 2)) + r
-            dx = (Math.random() - 0.5) * 2
-            dy = (Math.random() - 0.5) * 2
+            dx = (Math.random() - 0.5) * 4
+            dy = (Math.random() - 0.5) * 4
+            color = colors[Math.floor(Math.random() * colors.length)]
+
 
             function draw() {
-                ctx.strokeStyle = color
-                ctx.lineWidth = 10
-                ctx.fillStyle = 'black'
+                ctx.fillStyle = color
                 ctx.beginPath()
                 ctx.arc(x, y, r, 0, Math.PI * 2)
-                ctx.stroke()
                 ctx.fill()
             }
 
@@ -133,31 +97,46 @@
                 draw()
                 x += dx
                 y += dy
-                if(x + r >= canvasW || x - r <= 0) dx *= -1
-                if(y + r >= canvasH || y - r <= 0) dy *= -1
+                if (x + r >= canvasW || x - r <= 0) dx *= -1
+                if (y + r >= canvasH || y - r <= 0) dy *= -1
+
+                if (mouse.x - x < 60 && x - mouse.x < 60 &&
+                    mouse.y - y < 60 && y - mouse.y < 60) {
+                    if (r < bloatedR) {
+                        r += 5
+                    }
+                } else if (r > mainR) {
+                    r -= 1
+                    if (r < mainR) r = mainR
+                }
+
             }
 
             return {
                 move
             }
         }
-        
-        const circles = []
-        for(let i = 0; i < 300; i++) {
-            circles.push(createCircle())
-        }
 
-    
+        let circles = []
+        // create a bunch of circles
+        function initProcess() {
+            circles = []
+            for (let i = 0; i < maxCirclesAmount; i++) {
+                circles.push(createCircle())
+            }
+        }
+        // initial call
+        initProcess();
+
+
         (function animate() {
             requestAnimationFrame(animate)
             ctx.clearRect(0, 0, canvasW, canvasH)
-            for(const circle of circles) {
+            for (const circle of circles) {
                 circle.move()
             }
         })()
-
-
-
     </script>
 </body>
+
 </html>
